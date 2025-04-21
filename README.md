@@ -27,6 +27,8 @@ MCP Server for the Yandex Maps API.
      - `latitude_span` (number) - Height of map image in degrees
      - `longitude_span` (number) - Width of map image in degrees
      - `lang` (string, optional) - Language code (e.g., 'ru_RU', 'en_US')
+     - `placemarks` (array, optional) - Array of placemarks to display on the map with style "pm2rdm"
+       - Each placemark should have `latitude` and `longitude` properties
    - Returns: PNG image of the map
 
 ## Setup

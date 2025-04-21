@@ -167,6 +167,24 @@ const RENDER_MAP_TOOL: Tool = {
       lang: {
         type: "string",
         description: "Language code (e.g., 'ru_RU', 'en_US')"
+      },
+      placemarks: {
+        type: "array",
+        description: "Array of placemarks to display on the map (using pm2rdm style)",
+        items: {
+          type: "object",
+          properties: {
+            latitude: {
+              type: "number",
+              description: "Latitude coordinate of the placemark"
+            },
+            longitude: {
+              type: "number",
+              description: "Longitude coordinate of the placemark"
+            }
+          },
+          required: ["latitude", "longitude"]
+        }
       }
     },
     required: ["latitude", "longitude", "latitude_span", "longitude_span", "lang"]
@@ -239,8 +257,6 @@ async function handleReverseGeocode(latitude: number, longitude: number, lang: s
   url.searchParams.append("lang", lang);
   url.searchParams.append("apikey", YANDEX_MAPS_API_KEY);
 
-  console.error(url.toString());
-
   const response = await fetch(url.toString());
   const data = await response.json() as GeocodeResponse;
 
@@ -286,7 +302,8 @@ async function handleRenderMap(
   longitude: number,
   latitude_span: number,
   longitude_span: number,
-  lang: string
+  lang: string,
+  placemarks?: Array<{ latitude: number, longitude: number }>
 ) {
   // Calculate bounds based on center and span
   const ll = `${longitude},${latitude}`; // Center point (lon,lat)
@@ -298,6 +315,16 @@ async function handleRenderMap(
   url.searchParams.append("l", "map"); // Default layer type
   url.searchParams.append("lang", lang);
   url.searchParams.append("apikey", YANDEX_MAPS_STATIC_API_KEY);
+  
+  // Add placemarks if provided
+  if (placemarks && placemarks.length > 0) {
+    // Format: pt=lon1,lat1,pm2rdm~lon2,lat2,pm2rdm~...
+    const placemarksParam = placemarks
+      .map(mark => `${mark.longitude},${mark.latitude},pm2rdm`)
+      .join('~');
+    
+    url.searchParams.append("pt", placemarksParam);
+  }
 
   try {
     // Fetch the actual image data
@@ -381,14 +408,15 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case "maps_render": {
-        const { latitude, longitude, latitude_span, longitude_span, lang } = request.params.arguments as {
+        const { latitude, longitude, latitude_span, longitude_span, lang, placemarks } = request.params.arguments as {
           latitude: number;
           longitude: number;
           latitude_span: number;
           longitude_span: number;
           lang: string;
+          placemarks?: Array<{ latitude: number, longitude: number }>;
         };
-        return await handleRenderMap(latitude, longitude, latitude_span, longitude_span, lang);
+        return await handleRenderMap(latitude, longitude, latitude_span, longitude_span, lang, placemarks);
       }
 
       default:
