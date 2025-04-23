@@ -2,6 +2,14 @@
 
 MCP Server for the Yandex Maps API.
 
+> "Show me the map of Berlin"
+
+> "Show me location of ..."
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/peschinskiy/yandex-maps-mcp/main/example-usage.png" width="60%" alt="Yandex Maps MCP Screenshot">
+</p>
+
 ## Tools
 
 1. `maps_geocode`
@@ -95,3 +103,7 @@ Add the following to your `claude_desktop_config.json`:
 ## Known Limitations
 
 Yandex Maps Places API has no free tier, which means that LLMs cannot retrieve organization addresses and coordinates through the Yandex Maps MCP. It can only geocode places whose addresses or coordinates are already known to the model or retrieved from other sources such as explicit user input, Web Search, or third-party MCPs.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/peschinskiy/yandex-maps-mcp/blob/main/LICENSE) file for details.
