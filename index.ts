@@ -101,23 +101,43 @@ const YANDEX_MAPS_STATIC_API_KEY = getStaticApiKey();
 
 // Tool definitions
 const GEOCODE_TOOL: Tool = {
-    name: "maps_geocode",
-    description: "Convert an address into geographic coordinates",
-    inputSchema: {
-      type: "object",
-      properties: {
-        address: {
-          type: "string",
-          description: "The address to geocode"
-        },
-        lang: {
-          type: "string",
-          description: "Language code (e.g., 'ru_RU', 'en_US')"
-        }
+  name: "maps_geocode",
+  description: "Convert an address into geographic coordinates using individual address components",
+  inputSchema: {
+    type: "object",
+    properties: {
+      country: {
+        type: "string",
+        description: "The country name"
       },
-      required: ["address", "lang"]
-    }
-  };
+      state: {
+        type: "string",
+        description: "The state, region or province name"
+      },
+      city: {
+        type: "string",
+        description: "The city or locality name"
+      },
+      district: {
+        type: "string",
+        description: "The district or neighborhood within the city"
+      },
+      street: {
+        type: "string",
+        description: "The street name"
+      },
+      house_number: {
+        type: "string",
+        description: "The house or building number"
+      },
+      lang: {
+        type: "string",
+        description: "Language code, e.g. 'ru_RU', 'en_US'"
+      }
+    },
+    required: ["country", "lang"]
+  }
+};
 
 const REVERSE_GEOCODE_TOOL: Tool = {
   name: "maps_reverse_geocode",
@@ -135,7 +155,7 @@ const REVERSE_GEOCODE_TOOL: Tool = {
       },
       lang: {
         type: "string",
-        description: "Language code (e.g., 'ru_RU', 'en_US')"
+        description: "Language code, e.g. 'ru_RU', 'en_US'"
       }
     },
     required: ["latitude", "longitude", "lang"]
@@ -166,11 +186,11 @@ const RENDER_MAP_TOOL: Tool = {
       },
       lang: {
         type: "string",
-        description: "Language code (e.g., 'ru_RU', 'en_US')"
+        description: "Language code, e.g. 'ru_RU', 'en_US'"
       },
       placemarks: {
         type: "array",
-        description: "Array of placemarks to display on the map (using pm2rdm style)",
+        description: "Array of placemarks to display on the map",
         items: {
           type: "object",
           properties: {
@@ -201,7 +221,19 @@ const YANDEX_MAPS_GEOCODER_BASE_URL = "https://geocode-maps.yandex.ru/1.x/";
 const YANDEX_MAPS_STATIC_BASE_URL = "https://static-maps.yandex.ru/v1";
 
 // API handlers
-async function handleGeocode(address: string, lang: string) {
+async function handleGeocode(country: string, lang: string, state?: string, city?: string, district?: string, street?: string, house_number?: string) {
+  // Combine the address components into a single string, filtering out undefined values
+  const addressParts = [
+    house_number,
+    street,
+    district,
+    city,
+    state,
+    country
+  ].filter(part => part !== undefined && part !== '');
+  
+  const address = addressParts.join(', ');
+
   const url = new URL(YANDEX_MAPS_GEOCODER_BASE_URL);
   url.searchParams.append("geocode", address);
   url.searchParams.append("format", "json");
@@ -391,11 +423,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   try {
     switch (request.params.name) {
       case "maps_geocode": {
-        const { address, lang } = request.params.arguments as { 
-          address: string;
+        const { country, lang, state, city, district, street, house_number } = request.params.arguments as { 
+          country: string;
           lang: string;
+          state?: string;
+          city?: string;
+          district?: string;
+          street?: string;
+          house_number?: string;
         };
-        return await handleGeocode(address, lang);
+        return await handleGeocode(country, lang, state, city, district, street, house_number);
       }
 
       case "maps_reverse_geocode": {

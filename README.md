@@ -7,8 +7,13 @@ MCP Server for the Yandex Maps API.
 1. `maps_geocode`
    - Convert address to coordinates
    - Inputs:
-     - `address` (string) - The address to geocode
-     - `lang` (string, optional) - Language code (e.g., 'ru_RU', 'en_US')
+     - `country` (string) - The country name
+     - `lang` (string) - Language code (e.g., 'ru_RU', 'en_US')
+     - `state` (string, optional) - The state, region or province name
+     - `city` (string, optional) - The city or locality name
+     - `district` (string, optional) - The district or neighborhood within the city
+     - `street` (string, optional) - The street name
+     - `house_number` (string, optional) - The house or building number
    - Returns: location, formatted_address, address_components
 
 2. `maps_reverse_geocode`
@@ -16,7 +21,7 @@ MCP Server for the Yandex Maps API.
    - Inputs:
      - `latitude` (number)
      - `longitude` (number)
-     - `lang` (string, optional) - Language code (e.g., 'ru_RU', 'en_US')
+     - `lang` (string) - Language code (e.g., 'ru_RU', 'en_US')
    - Returns: location, formatted_address, address_components
 
 3. `maps_render`
@@ -26,7 +31,7 @@ MCP Server for the Yandex Maps API.
      - `longitude` (number) - Longitude coordinate of map center
      - `latitude_span` (number) - Height of map image in degrees
      - `longitude_span` (number) - Width of map image in degrees
-     - `lang` (string, optional) - Language code (e.g., 'ru_RU', 'en_US')
+     - `lang` (string) - Language code (e.g., 'ru_RU', 'en_US')
      - `placemarks` (array, optional) - Array of placemarks to display on the map with style "pm2rdm"
        - Each placemark should have `latitude` and `longitude` properties
    - Returns: PNG image of the map
@@ -36,18 +41,14 @@ MCP Server for the Yandex Maps API.
 ### API Keys
 You'll need two Yandex Maps API keys:
 
-1. JavaScript and Geocoder API key for geocoding functions
+1. "JavaScript and Geocoder API" key for geocoding functions
 2. Static API key for map rendering
 
 To generate API keys:
 1. Open https://developer.tech.yandex.ru/ and authorize
-2. Click 'Connect APIs'. Choose 'JavaScript and Geocoder API' and fill the form
+2. Click "Connect APIs". Choose "JavaScript and Geocoder API" and fill the form
 3. Navigate to API's dashboard page and copy API key there
 4. Repeat from step 2 for Static API.
-
-Set these as environment variables:
-- `YANDEX_MAPS_API_KEY` - For geocoding operations
-- `YANDEX_MAPS_STATIC_API_KEY` - For static map rendering
 
 ### Local Run
 
@@ -68,9 +69,6 @@ Set these as environment variables:
 4. Run the server:
    ```bash
    node dist/index.js
-   # Or if using TypeScript directly:
-   ts-node dist/index.js
-   index.ts
    ```
 
 ### Usage with Claude Desktop
@@ -93,3 +91,7 @@ Add the following to your `claude_desktop_config.json`:
   }
 }
 ```
+
+## Known Limitations
+
+Yandex Maps Places API has no free tier, which means that LLMs cannot retrieve organization addresses and coordinates through the Yandex Maps MCP. It can only geocode places whose addresses or coordinates are already known to the model or retrieved from other sources such as explicit user input, Web Search, or third-party MCPs.
