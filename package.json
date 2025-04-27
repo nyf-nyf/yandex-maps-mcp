@@ -1,5 +1,5 @@
 {
-  "name": "yandex-maps-mcp",
+  "name": "@peschinskiy/yandex-maps-mcp",
   "version": "0.1.0",
   "description": "MCP server for using the Yandex Maps API",
   "author": "Igor Peschinskiy",
@@ -12,6 +12,9 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
   "scripts": {
     "build": "tsc && shx chmod +x dist/*.js",
     "prepare": "npm run build",
