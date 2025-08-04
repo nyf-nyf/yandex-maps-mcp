@@ -74,15 +74,27 @@ To generate API keys:
    ```bash
    npm run build
    ```
-4. Run the server:
+5. Run the server:
+   
+   **For stdio transport (default):**
    ```bash
-   node dist/index.js
+   npm start
+   ```
+   
+   **For SSE (Server-Sent Events) transport:**
+   ```bash
+   npm start:sse
+   ```
+   The SSE server will run on http://localhost:3000 by default. You can change the port:
+   ```bash
+   PORT=8080 npm start:sse
    ```
 
 ### Usage with Claude Desktop
 
 Add the following to your `claude_desktop_config.json`:
 
+**For stdio transport:**
 ```json
 {
   "mcpServers": {
@@ -94,6 +106,29 @@ Add the following to your `claude_desktop_config.json`:
       "env": {
         "YANDEX_MAPS_API_KEY": "<YOUR_GEOCODER_API_KEY>",
         "YANDEX_MAPS_STATIC_API_KEY": "<YOUR_STATIC_API_KEY>"
+      }
+    }
+  }
+}
+```
+
+**For SSE transport:**
+```json
+{
+  "mcpServers": {
+    "yandex-maps": {
+      "command": "node",
+      "args": [
+        "path/to/server-sse.js"
+      ],
+      "env": {
+        "YANDEX_MAPS_API_KEY": "<YOUR_GEOCODER_API_KEY>",
+        "YANDEX_MAPS_STATIC_API_KEY": "<YOUR_STATIC_API_KEY>",
+        "PORT": "3000"
+      },
+      "transport": {
+        "type": "sse",
+        "url": "http://localhost:3000/sse"
       }
     }
   }
